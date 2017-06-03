@@ -4,9 +4,9 @@ import os.path
 
 from setuptools import setup
 
-__author__ = 'jscarlett'
-__email__ = "jscarlett@gmail.com"
-__version__ = "0.0.1"
+__author__ = 'Jamaal Scarlett'
+__email__ = "jamaal.scarlett@gmail.com"
+__version__ = "0.0.2"
 
 here = os.path.abspath(os.path.dirname(__file__))
 with io.open(os.path.join(here, 'README.rst'), encoding='utf8') as f:

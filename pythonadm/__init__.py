@@ -57,6 +57,7 @@ class AmazonDeviceMessaging:
         self.registration_url = registration_url
         self.token_url = token_url
         self.retry_after = None
+        self.token = None
 
     def request_token(self):
         try:
@@ -67,13 +68,13 @@ class AmazonDeviceMessaging:
                     'client_id': self.client_id
                     }
             result = requests.post(self.token_url, headers=headers, data=data)
-            token_data = result.json()
-            return token_data
+            token = result.json()
+            return token
         except Exception:
             return None
 
-    def send_message(self, registration_id, token_data, message=None,
-                     consolidation_key=None, expires_after=None, data={},
+    def send_message(self, registration_id, data, token=None,
+                     consolidation_key=None, expires_after=None,
                      send_md5=False):
         if self.retry_after:
             if self.retry_after > datetime.datetime.now():
@@ -81,15 +82,17 @@ class AmazonDeviceMessaging:
                         'error': 'Messages can not be sent until %s' % str(self.retry_after)}
             else:
                 self.retry_after = None
+
+        if not token:
+            token = self.request_token()
+
         url = '%s%s/messages' % (self.registration_url, registration_id)
         headers = {'Content-Type': 'application/json',
                    'Accept': 'application/json',
                    'x-amzn-type-version': X_AMAZON_TYPE_VERSION,
                    'x-amzn-accept-type': X_AMAZON_ACCEPT_TYPE,
-                   'Authorization': "Bearer " + token_data.get('access_token',
+                   'Authorization': "Bearer " + token.get('access_token',
                                                                None)}
-        if message:
-            data['message'] = message
 
         payload = {'data': data}
         if consolidation_key:
